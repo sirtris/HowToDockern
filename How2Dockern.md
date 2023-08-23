@@ -147,6 +147,12 @@ docker exec -it <container-name> /bin/bash
 https://docs.docker.com/get-started/04_sharing_app/
 First, you need to generate an account at [Dockerhub](https://hub.docker.com/).
 
+```bash
+docker login -u <user-name>
+docker tag <image-name> <user-name>/<image-name>:<version>
+docker push <user-name>/<image-name>:<version>
+```
+
 ### Use on cluster 
 You should be able to use the docker image on dockerhub for the submit script of slurm on our cluster. It should look somewhat like: 
 
