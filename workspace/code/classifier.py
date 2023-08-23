@@ -9,12 +9,16 @@ import os
 import wandb
 import argparse
 import random
-
+from dotenv import load_dotenv
 from model import Net
 
 
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
+
+load_dotenv()
+
+
 
 # Tutorial from: https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
 
@@ -78,7 +82,6 @@ if __name__ == '__main__':
     parser.add_argument('--wandb_group', type = str, default="Collection", help='wandb Group')
     parser.add_argument('--seed', type = int, default=42, help='Deterministic Seed')
     parser.add_argument('--deterministic', type = str, choices=["true", "false"], default="false", help='Deterministic Mode')
-
 
 
     args = parser.parse_args()

@@ -12,6 +12,7 @@ An example project can be found [here](github.link)
 ## Best Practices with Docker
 For new projects, I recommend following structure: 
 ```
+repository
 ├── workspace
 │   ├── code
 │   │   ├── all your code
@@ -19,9 +20,10 @@ For new projects, I recommend following structure:
 │   │   ├── all your data
 │   ├── output
 │   │   ├── logging + checkpoints
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   ├── README.md
+│   ├── .env
+├── Dockerfile
+├── requirements.txt
+├── README.md
 └── .gitignore
 ```
 - Like this, you can easily mount/add your code and data directory seperately. 
@@ -100,7 +102,7 @@ docker run --gpus all -it --rm --ipc=host -v /local_dir/:/container_dir/ --name 
 
 Example:
 ```bash
-docker run --gpus all -it --rm --ipc=host -v /mnt/e/Documents/UbuntuCode/GPU_Test/code/:/workspace/code/ --name mypytorchproject pytorch/pytorch:1.4-cuda10.1-cudnn7-devel
+docker run --gpus all -it --rm --ipc=host -v /mnt/e/Documents/UbuntuCode/1_DockerTest/HowToDockern/workspace/:/repository/workspace/ --name docker_gpu_container docker_gpu
 ```
 
 `--gpus` Useage of available CUDA GPUs (`all`, `0`, `1`, ...)
