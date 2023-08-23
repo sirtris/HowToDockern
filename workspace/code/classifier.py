@@ -30,7 +30,7 @@ def init_logging(args):
     wandb.init(config = args, reinit=True, group = args.wandb_group, mode='online')
     wandb.run.name = date_time+"_"+str(wandb.run.id)
 
-    log_path = "./output/"+args.wandb_project+"/"+args.wandb_group+"/"+str(wandb.run.name)+"/"
+    log_path = "../output/"+args.wandb_project+"/"+args.wandb_group+"/"+str(wandb.run.name)+"/"
     wandb.log({"Logging Path": log_path})
     os.makedirs(log_path, exist_ok=True)    
     return log_path
