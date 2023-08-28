@@ -207,6 +207,31 @@ Generate a docker image from a docker container. More info [here](https://www.da
 docker commit <container-name> <image-name>
 ```
 
+## Making the GPU available during docker build
+
+Make sure, that you have `nvidia-drivers`, `nvidia-cuda-runtime`, `nvidia-docker`, `nvidia-cuda-toolkit` installed. (For example, do `sudo apt-get install nvidia-container-runtime`)
+
+Make sure `/etc/docker/daemon.json` looks like follows: 
+```json
+{
+ "runtimes": {
+     "nvidia": {
+         "path": "/usr/bin/nvidia-container-runtime",
+         "runtimeArgs": []
+         }
+     },
+     "default-runtime": "nvidia"
+ }
+```
+
+When building the docker do: 
+```bash
+DOCKER_BUILDKIT=0 docker build ...
+```
+
+>**__NOTE__**: When this is not working, try to build dependencies inside a running container (which is started by `docker run --gpus all ...`) and generate a new image from this container using `docker commit ...`
+
+
 
 ## Optional: Run docker image for releases 
 Runs a docker image that has been build from a file that already includes the code. However, since the docker image would become rather big, we do not include the data, but mount the volume via the -v flag.  
