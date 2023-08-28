@@ -4,7 +4,7 @@
 Clone the repository and setup the correct folder structure.
 ```bash
 git clone https://github.com/HannahKniesel/HowToDockern.git
-cd HowToDockern
+cd HowToDockern/workspace
 mkdir data
 mkdir output
 ```
@@ -16,7 +16,7 @@ docker build -t <image-name> .
 
 Run the docker image (locally - for development)
 ```bash
-docker run --gpus all -it --rm --ipc=host -v /mnt/e/Documents/UbuntuCode/1_DockerTest/HowToDockern/workspace/:/repository/workspace/ --name <container-name> <image-name>
+docker run --gpus all -it --rm --ipc=host -v /mnt/e/Documents/UbuntuCode/1_DockerTest/HowToDockern/workspace/:/workspace/ --name <container-name> <image-name>
 ```
 
 Push the docker to dockerhub
@@ -27,12 +27,10 @@ docker push <user-name>/<image-name>:<version>
 ```
 
 Use on cluster
-> **__NOTE__** Make sure that your startscript.sh lies in the directory ´/code/´ and you submit from this directory. Also, your code should be developed, to be started from this directory.
 
 Your startscript.sh should look like this: 
 ```bash
 python classifier.py
-
 ```
 
 Then you can submit it as follows:
