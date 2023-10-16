@@ -164,3 +164,4 @@ cython_debug/
 workspace/data/*
 workspace/wandb/*
 workspace/output/*
+*wandb*
