@@ -12,7 +12,7 @@ An example project can be found [here](github.link)
 ## Best Practices with Docker
 For new projects, I recommend following structure: 
 ```
-repository
+
 ├── workspace
 │   ├── code
 │   │   ├── all your code
@@ -26,7 +26,7 @@ repository
 ├── README.md
 └── .gitignore
 ```
-- Like this, you can easily mount/add your code and data directory seperately. 
+- Like this, you can easily mount/add your code and data directory seperately or all together - whatever is needed. 
 - The requirements.txt should have all python packages with version control. It can hence be accessed in the *Dockerfile* to install dependencies. 
 - Using git + wandb in combintation with docker will help you to keep track of the docker you used for the experiment, as you can access the git commit from your wandb experiments, and then link these to the corresponding dockerfile.  
 - You should keep some additional file to write down the results of your experiments. There you should also link the corresponding wandb projects, groups or runs. If you like you can add version control to your docker images and link them in this file as well. (So if you ever want to redo an experiment, you just go to the wandb run, copy the command to run it, get your docker image, and do so.)
@@ -39,11 +39,13 @@ This way, when you use git + wandb you can find the corresponding commit of one 
 
 Simple example for docker of pytorch extension: 
 ```docker
-FROM pytorch/pytorch:latest
-ADD requirements.txt /workspace/ 
-RUN pip install -r /workspace/requirements.txt
-ENV CUBLAS_WORKSPACE_CONFIG=:16:8 
+FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
 RUN apt-get update && apt-get upgrade -y
+ADD requirements.txt /reproducability/
+ADD Dockerfile /reproducability/
+RUN pip install -r /reproducability/requirements.txt
+WORKDIR /workspace/
+ENV CUBLAS_WORKSPACE_CONFIG=:16:8 
 ```
 
 [`FROM`](https://docs.docker.com/engine/reference/builder/#from)
@@ -57,7 +59,7 @@ Executes any commands on top of the new image and commits the results. The resul
 The `ENV` instruction sets the environment variable `<key>` to the value `<value>` (such as `ENV <key>=<value>`)
 
 [`ADD`](https://docs.docker.com/engine/reference/builder/#add)
-The `ADD` instruction copies new files, directories or remote file URLs from `<src>` and adds them to the filesystem of the image at the path `<dest>` (such as `ADD <src>,... <dest>`). This is helpful when probably for a final release the code/data or similar should be *included* in the docker image itself. 
+The `ADD` instruction copies new files, directories or remote file URLs from `<src>` and adds them to the filesystem of the image at the path `<dest>` (such as `ADD <src>,... <dest>`). This is helpful when probably for a final release the code/data or similar should be *included* in the docker image itself. *Adding the Dockerfile as well as the requirements.txt to your docker image, will help to understand on how you build the image. Hence, I would recommend adding it - just in case.*
 
 [`COPY`](https://docs.docker.com/engine/reference/builder/#copy)
 The `COPY` instruction copies new files or directories from `<src>` and adds them to the filesystem of the container at the path `<dest>` (such as `COPY <src>,... <dest>`)
@@ -67,13 +69,15 @@ The `COPY` instruction copies new files or directories from `<src>` and adds the
 ### Make your own *Dockerfile*
 
 ```docker
-FROM pytorch/pytorch:latest
-ADD requirements.txt /workspace/ 
-RUN pip install -r /workspace/requirements.txt
-ENV CUBLAS_WORKSPACE_CONFIG=:16:8 
+FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
 RUN apt-get update && apt-get upgrade -y
+ADD requirements.txt /reproducability/
+ADD Dockerfile /reproducability/
+RUN pip install -r /reproducability/requirements.txt
+WORKDIR /workspace/
+ENV CUBLAS_WORKSPACE_CONFIG=:16:8 
 ```
-In this case, we will include requirements.txt in the docker image, to later access them if we need to. Note that we do not add (`ADD`) code or data since we want to be able to make local changes. 
+In this case, we will include requirements.txt and Dockerfile in the docker image, to later access them if we need to. Note that we do not add (`ADD`) code or data since we want to be able to make local changes. 
 
 ### Build this *Dockerfile* to get a docker image
 
@@ -173,7 +177,12 @@ Show all docker containers
 docker container ls -a
 ```
 
-Start a docker container
+Generates a new docker container from the image.
+```bash
+docker run ... 
+```
+
+Start a docker container (starts the exact instance of the docker container with the state that it was left - probably you installed some additional dependencies inside this container.)
 ```bash
 docker start <container-name>
 ```
@@ -192,6 +201,36 @@ Remove docker container
 ```bash
 docker rm <name>
 ```
+
+Generate a docker image from a docker container. More info [here](https://www.dataset.com/blog/create-docker-image/).
+```bash
+docker commit <container-name> <image-name>
+```
+
+## Making the GPU available during docker build
+
+Make sure, that you have `nvidia-drivers`, `nvidia-cuda-runtime`, `nvidia-docker`, `nvidia-cuda-toolkit` installed. (For example, do `sudo apt-get install nvidia-container-runtime`)
+
+Make sure `/etc/docker/daemon.json` looks like follows: 
+```json
+{
+ "runtimes": {
+     "nvidia": {
+         "path": "/usr/bin/nvidia-container-runtime",
+         "runtimeArgs": []
+         }
+     },
+     "default-runtime": "nvidia"
+ }
+```
+
+When building the docker do: 
+```bash
+DOCKER_BUILDKIT=0 docker build ...
+```
+
+>**__NOTE__**: When this is not working, try to build dependencies inside a running container (which is started by `docker run --gpus all ...`) and generate a new image from this container using `docker commit ...`
+
 
 
 ## Optional: Run docker image for releases 

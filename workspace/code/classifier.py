@@ -30,7 +30,7 @@ def init_logging(args):
     wandb.init(config = args, reinit=True, group = args.wandb_group, mode='online')
     wandb.run.name = date_time+"_"+str(wandb.run.id)
 
-    log_path = "./output/"+args.wandb_project+"/"+args.wandb_group+"/"+str(wandb.run.name)+"/"
+    log_path = "../output/"+args.wandb_project+"/"+args.wandb_group+"/"+str(wandb.run.name)+"/"
     wandb.log({"Logging Path": log_path})
     os.makedirs(log_path, exist_ok=True)    
     return log_path
@@ -98,12 +98,12 @@ if __name__ == '__main__':
 
     batch_size = args.batch_size
 
-    trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
+    trainset = torchvision.datasets.CIFAR10(root='../data', train=True,
                                             download=True, transform=transform)
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                             shuffle=True, num_workers=2)
 
-    testset = torchvision.datasets.CIFAR10(root='./data', train=False,
+    testset = torchvision.datasets.CIFAR10(root='../data', train=False,
                                         download=True, transform=transform)
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                             shuffle=False, num_workers=2)
